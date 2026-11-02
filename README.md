@@ -17,24 +17,21 @@
 
 **Local Verification (`LV`)** is an offline verification utility designed for wearers of chastity devices who want absolute certainty that **no intimate photos or videos can ever be stored, leaked, or sent to a server**.
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        YOUR MOBILE DEVICE                              │
-│                                                                        │
-│   [Camera] ──> [RAM Buffer] ──> [On-Device AI] ──> [Scrub RAM (0x00)]   │
-│                                       │                                │
-│                                       ▼                                │
-│                     [Signed HMAC-SHA256 Proof Token]                   │
-│                                       │                                │
-│                     [High-Contrast QR Code on Screen]                  │
-└───────────────────────────────────────┬────────────────────────────────┘
-                                        │ (Scan with Web Cam)
-                                        ▼
-                           ┌─────────────────────────┐
-                           │    Chaster Extension    │
-                           │  (Verifies Cryptography)│
-                           └─────────────────────────┘
-                               NO IMAGES TRANSMITTED
+```mermaid
+flowchart TD
+    subgraph Device["📱 YOUR MOBILE DEVICE (Air-Gapped & Ephemeral)"]
+        direction TB
+        Camera["📷 Camera Sensor"] --> RAM["🧠 Temporary RAM Buffer"]
+        RAM --> AI["🤖 On-Device AI Engine"]
+        AI --> Scrub["🧼 Scrub RAM (0x00 Active Overwrite)"]
+        AI --> Token["🔐 Signed HMAC-SHA256 Proof Token"]
+    end
+
+    subgraph Chaster["💻 Chaster Browser Extension"]
+        Verify["🛡️ Mathematical Signature Verified (No Images Transmitted)"]
+    end
+
+    Token -->|"Pass Proof Token"| Verify
 ```
 
 ### 1. 📴 Physically Air-Gapped (Zero Internet Permission)
@@ -106,11 +103,9 @@ The app switches to the analyzing screen with an animated status indicator:
 
 ### Step 5: Submit Verification to Chaster
 Once verified, the full-screen **Verification Result** page displays:
-- A high-contrast **Chaster Pairing QR Code**.
 - An **HMAC-SHA256 Proof Token**.
 
 **To submit:**
-- Hold your phone screen up to your computer webcam to scan the QR code in the Chaster extension, **OR**
 - Tap **Copy** and paste the proof token string into the Chaster extension input field.
 
 The Chaster extension verifies the signature instantly and clears your verification check-in!

@@ -10,31 +10,29 @@ Normally, wearers perform single-check verifications on demand by copying an OTP
 
 In an **Offline Verification Session**, wearers can execute a multi-stage periodic verification schedule completely air-gapped (e.g. while traveling, on an airplane, sleeping, or away from a computer), and subsequently upload a single, cryptographically signed batch bundle back to Chaster.
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        OFFLINE PERIODIC RUNNER                         │
-│                                                                        │
-│   [Chaster Extension] ──> Generates Link / QR with Lock Schedule       │
-│                                       │                                │
-│                                       ▼                                │
-│   [LV App: Tab 3] ───────> Locks Hardware Countdown Timer              │
-│                                       │                                │
-│   [Check 1/4] ───> Verified & Signed ──> Cryptographic Proof #1        │
-│         │ (Hardware timer locked: e.g. 4 hours)                        │
-│         ▼                                                              │
-│   [Check 2/4] ───> Verified & Signed ──> Chained to Proof #1           │
-│         │ (Hardware timer locked: e.g. 4 hours)                        │
-│         ▼                                                              │
-│   [Check 3/4] ───> Verified & Signed ──> Chained to Proof #2           │
-│         │ (Hardware timer locked: e.g. 4 hours)                        │
-│         ▼                                                              │
-│   [Check 4/4] ───> Verified & Signed ──> Chained to Proof #3           │
-│                                       │                                │
-│                                       ▼                                │
-│                       [Signed Batch Proof Bundle]                      │
-│                                       │                                │
-│                   (Single 1-tap copy & paste into Chaster)             │
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Runner["📱 OFFLINE PERIODIC RUNNER"]
+        direction TB
+        Ext["💻 Chaster Extension"] -->|"Generates Link or QR with Schedule"| App["📲 LV App: Offline Session Tab"]
+        App -->|"Starts Hardware Monotonic Clock"| Timer["⏳ Tamper-Proof Hardware Timer Locked"]
+
+        Timer --> C1["🔍 Check 1/4: Verified & Signed"]
+        C1 -->|"Generates Proof #1"| P1["🔗 Cryptographic Proof #1"]
+
+        C1 -->|"Hardware Timer Locked (e.g. 4h)"| C2["🔍 Check 2/4: Verified & Signed"]
+        C2 -->|"Chained to Proof #1"| P2["🔗 Ratchet Chain Proof #2"]
+
+        C2 -->|"Hardware Timer Locked (e.g. 4h)"| C3["🔍 Check 3/4: Verified & Signed"]
+        C3 -->|"Chained to Proof #2"| P3["🔗 Ratchet Chain Proof #3"]
+
+        C3 -->|"Hardware Timer Locked (e.g. 4h)"| C4["🔍 Check 4/4: Verified & Signed"]
+        C4 -->|"Chained to Proof #3"| P4["🔗 Final Ratchet Proof #4"]
+
+        P4 --> Bundle["📦 Signed Batch Proof Bundle"]
+    end
+
+    Bundle -->|"1-Tap Copy & Paste (When back online)"| Finish["💻 Chaster Extension (Full Chain Validated)"]
 ```
 
 ---
