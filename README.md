@@ -41,7 +41,7 @@
 The app is built without network capability. In the application manifest (`AndroidManifest.xml`), the standard `android.permission.INTERNET` permission is **completely absent**. The mobile operating system physically blocks the app from creating any socket, HTTP, or network connections.
 
 ### 2. 🧼 Ephemeral RAM Scrubbing
-Camera frames reside strictly in temporary volatile memory (`Uint8List`). Immediately upon running on-device inference, the memory buffer is actively overwritten with all zeros (`0x00`) using cryptographic memory scrubbing before being deallocated.
+Camera frames reside strictly in temporary volatile RAM. Immediately upon running on-device inference, the memory buffer is actively overwritten with all zeros (`0x00`) using cryptographic memory scrubbing before being deallocated.
 
 ### 3. 🚫 Zero Local Storage
 The app does **not** save photos to the camera roll, photo gallery, temporary cache, or filesystem. Even if verification fails or an inspection error occurs, no imagery is ever persisted.
@@ -79,15 +79,15 @@ aapt dump permissions lv-vX.Y.Z.apk
 
 ## 🚀 Step-by-Step User Guide
 
-### Step 1: Pair with Your Chaster Extension (One-Time)
-1. Open the Chaster browser extension on your computer.
-2. In the extension settings, click **Show Pairing Key**.
-3. In the LV mobile app, tap the **Key** icon on the top bar and scan the extension QR code (or paste the secret key).
-4. Both devices now share a cryptographic HMAC key used to sign and verify proofs offline.
+### Step 1: Scan or Enter Your Lock Session Token & Challenge Code
+When a check-in is required, the Chaster extension displays a unique 6-digit challenge code and session key (or a single verification QR code).
 
-### Step 2: Receive Your Dynamic Challenge Code
-When a check-in is required, the Chaster extension displays a unique 6-digit challenge code (e.g., `849 201`).
-Write this code on a piece of paper or your skin.
+On the **Verify** tab in the LV mobile app:
+- Tap **Scan Chaster QR (Auto-Fill Both)** to automatically populate both your session token and 6-digit challenge code in one tap, **OR**
+- Paste your extension token into the **Extension Token / Secret Key** field (it will be automatically remembered for this lock session) and enter the 6-digit challenge code.
+
+### Step 2: Prepare Your Handwritten Challenge Code
+Write the 6-digit challenge code on a piece of paper or your skin so it can be verified in the camera viewfinder alongside your device.
 
 ### Step 3: Run On-Device Verification
 1. On the **Verify** tab, select your device profile:
@@ -117,14 +117,39 @@ The Chaster extension verifies the signature instantly and clears your verificat
 
 ---
 
+## ⏱️ Offline Periodic Sessions (Air-Gapped Batch Mode)
+
+For long-term offline periods (e.g. traveling, sleeping, or away from a computer), `LV` supports multi-check **Offline Verification Sessions** located on the **Offline Session** tab:
+
+1. **Hardware Monotonic Lock**: The app reads direct hardware uptime counters (measuring genuine physical time since boot, including sleep). Changing device date/time in OS Settings cannot bypass the interval lock.
+2. **Cryptographic Hash Chaining**: Every check embeds the SHA-256 hash of the previous check, ensuring proofs cannot be reordered or forged.
+3. **Batch Export**: Once checks are completed, tap **Copy Batch** to export a signed verification bundle directly to Chaster.
+
+### 🧪 Try an Instant Demo Session
+To test offline verification on your device without waiting hours, point the LV app scanner at this QR code or copy the test link:
+
+<p align="center">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=lv%3A%2F%2Fverify%3Fsession_id%3Ddemo_quick_test%26interval_m%3D1%26total_checks%3D3%26min_conf%3D0.60%26deadline_ts%3D1893456000%26type%3Dmale_cage_padlock" width="180" alt="Instant Demo QR" /><br/>
+  <em>Scan directly with the LV App ("Scan Chaster QR" button)</em>
+</p>
+
+```text
+lv://verify?session_id=demo_quick_test&interval_m=1&total_checks=3&min_conf=0.60&deadline_ts=1893456000&type=male_cage_padlock
+```
+*In the app: tap **Scan Chaster QR** on Tab 1 or go to **Offline Session** $\rightarrow$ tap **Scan Session QR Code**.*
+
+> 📖 **Full Guide & Security Architecture**: See [docs/OFFLINE_VERIFICATION.md](docs/OFFLINE_VERIFICATION.md) for full protocol specifications and additional test links.
+
+---
+
 ## 🔍 Hardware & Compliance Profiles
 
-| Device Profile | Required Objects | Prohibited Violations |
+| Device Profile | Required Verification State | Immediate Security Violations |
 | :--- | :--- | :--- |
-| **Male Cage (Padlock)** | `cage_worn` + `padlock_locked` | `padlock_open`, `key_inserted`, `device_not_worn`, unlocked anatomy |
-| **Male Cage (Built-in)** | `cage_worn` (locked cylinder) | `key_inserted`, `device_not_worn`, unlocked anatomy |
-| **Female Belt (Padlock)** | `belt_worn` + `padlock_locked` | `padlock_open`, `key_inserted`, `device_not_worn`, unlocked anatomy |
-| **Female Belt (Built-in)** | `belt_worn` | `key_inserted`, `device_not_worn`, unlocked anatomy |
+| **Male Cage (Padlock)** | Device properly worn + Padlock shackle fully closed | Open padlock, key inserted in lock, unworn loose device, or unlocked anatomy |
+| **Male Cage (Built-in)** | Device properly worn with internal lock cylinder engaged | Key inserted in lock, unworn loose device, or unlocked anatomy |
+| **Female Belt (Padlock)** | Belt properly worn + Padlock shackle fully closed | Open padlock, key inserted in lock, unworn loose device, or unlocked anatomy |
+| **Female Belt (Built-in)** | Belt properly worn with built-in closure locked | Key inserted in lock, unworn loose device, or unlocked anatomy |
 
 ---
 
@@ -146,6 +171,12 @@ Make sure the code is written in bold, clear numbers with high contrast (dark ma
 <summary><strong>Can this be used on an airplane or without cellular service?</strong></summary>
 
 **Yes!** The application is 100% offline. You do not need Wi-Fi or cellular reception to run verification.
+</details>
+
+<details>
+<summary><strong>Can someone cheat periodic checks by changing the date or time on their phone?</strong></summary>
+
+**No.** The app enforces check intervals using a hardware uptime clock. This counter measures genuine hardware CPU ticks and deep-sleep time; changing the phone's date, time, or timezone in system settings has zero effect on the countdown lock.
 </details>
 
 ---
