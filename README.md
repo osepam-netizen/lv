@@ -98,7 +98,7 @@ Write the 6-digit challenge code on a piece of paper or your skin so it can be v
 The app switches to the analyzing screen with an animated status indicator:
 1. *Scans for handwritten 6-digit challenge code via local OCR.*
 2. *Inspects device presence and locked padlock engagement via LiteRT neural engine.*
-3. *Enforces anti-cheating rules (detects open shackles, inserted keys, or unworn loose hardware).*
+3. *Enforces anti-cheating & live scene checks (rejects photos of screens/monitors, printed photos, open shackles, inserted keys, or unworn loose hardware).*
 4. *Signs the verification result with HMAC-SHA256.*
 
 ### Step 5: Submit Verification to Chaster
@@ -141,10 +141,10 @@ lv://verify?session_id=demo_quick_test&interval_m=1&total_checks=3&min_conf=0.60
 
 | Device Profile | Required Verification State | Immediate Security Violations |
 | :--- | :--- | :--- |
-| **Male Cage (Padlock)** | Device properly worn + Padlock shackle fully closed | Open padlock, key inserted in lock, unworn loose device, or unlocked anatomy |
-| **Male Cage (Built-in)** | Device properly worn with internal lock cylinder engaged | Key inserted in lock, unworn loose device, or unlocked anatomy |
-| **Female Belt (Padlock)** | Belt properly worn + Padlock shackle fully closed | Open padlock, key inserted in lock, unworn loose device, or unlocked anatomy |
-| **Female Belt (Built-in)** | Belt properly worn with built-in closure locked | Key inserted in lock, unworn loose device, or unlocked anatomy |
+| **Male Cage (Padlock)** | Device properly worn + Padlock shackle fully closed | Open padlock, key inserted in lock, unworn loose device, unlocked anatomy, or screen/photo spoof |
+| **Male Cage (Built-in)** | Device properly worn with internal lock cylinder engaged | Key inserted in lock, unworn loose device, unlocked anatomy, or screen/photo spoof |
+| **Female Belt (Padlock)** | Belt properly worn + Padlock shackle fully closed | Open padlock, key inserted in lock, unworn loose device, unlocked anatomy, or screen/photo spoof |
+| **Female Belt (Built-in)** | Belt properly worn with built-in closure locked | Key inserted in lock, unworn loose device, unlocked anatomy, or screen/photo spoof |
 
 ---
 
