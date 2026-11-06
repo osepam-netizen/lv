@@ -83,25 +83,22 @@ On the **Verify** tab in the LV mobile app:
 - Tap **Scan Chaster QR (Auto-Fill Both)** to automatically populate both your session token and 6-digit challenge code in one tap, **OR**
 - Paste your extension token into the **Extension Token / Secret Key** field (it will be automatically remembered for this lock session) and enter the 6-digit challenge code.
 
-### Step 2: Prepare Your Handwritten Challenge Code
-Write the 6-digit challenge code on a piece of paper or your skin so it can be verified in the camera viewfinder alongside your device.
-
-### Step 3: Run On-Device Verification
+### Step 2: Run On-Device Verification
 1. On the **Verify** tab, select your device profile:
    - **Male Chastity Cage** (Built-in Lock or Padlock)
    - **Female Chastity Belt** (Built-in Lock or Padlock)
 2. Tap **Start Camera Inspection**.
-3. Align the camera viewfinder so that your locked device and handwritten challenge code are clearly visible.
+3. Align the camera viewfinder so that your locked chastity device is clearly visible. (You do not need to write codes on paper—the active challenge code is cryptographically bound into the proof token).
 4. Tap the capture button.
 
-### Step 4: Live On-Device Analysis
+### Step 3: Live On-Device Analysis
 The app switches to the analyzing screen with an animated status indicator:
-1. *Scans for handwritten 6-digit challenge code via local OCR.*
+1. *Binds the active 6-digit challenge code to the cryptographic proof.*
 2. *Inspects device presence and locked padlock engagement via LiteRT neural engine.*
 3. *Enforces anti-cheating & live scene checks (rejects photos of screens/monitors, printed photos, open shackles, inserted keys, or unworn loose hardware).*
 4. *Signs the verification result with HMAC-SHA256.*
 
-### Step 5: Submit Verification to Chaster
+### Step 4: Submit Verification to Chaster
 Once verified, the full-screen **Verification Result** page displays:
 - An **HMAC-SHA256 Proof Token**.
 
