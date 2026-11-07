@@ -21,13 +21,13 @@ flowchart TD
         C1 -->|"Generates Proof #1"| P1["🔗 Cryptographic Proof #1"]
 
         C1 -->|"Hardware Timer Locked (e.g. 4h)"| C2["🔍 Check 2/4: Verified & Signed"]
-        C2 -->|"Chained to Proof #1"| P2["🔗 Ratchet Chain Proof #2"]
+        C2 -->|"Chained to Proof #1"| P2["🔗 Chained Proof #2"]
 
         C2 -->|"Hardware Timer Locked (e.g. 4h)"| C3["🔍 Check 3/4: Verified & Signed"]
-        C3 -->|"Chained to Proof #2"| P3["🔗 Ratchet Chain Proof #3"]
+        C3 -->|"Chained to Proof #2"| P3["🔗 Chained Proof #3"]
 
         C3 -->|"Hardware Timer Locked (e.g. 4h)"| C4["🔍 Check 4/4: Verified & Signed"]
-        C4 -->|"Chained to Proof #3"| P4["🔗 Final Ratchet Proof #4"]
+        C4 -->|"Chained to Proof #3"| P4["🔗 Final Chained Proof #4"]
 
         P4 --> Bundle["📦 Signed Batch Proof Bundle"]
     end
@@ -44,14 +44,14 @@ Standard phone clocks can be rolled forward or backward in device settings to fa
 
 Changing system dates, times, or timezones in iOS or Android settings has **zero effect** on this hardware counter. The next check cannot be unlocked until the genuine physical duration has passed.
 
-### 2. Cryptographic Hash Ratchet Chaining
-Every check is mathematically chained to the check before it. Like physical links in a lock chain:
-- Each proof includes an encrypted digital fingerprint of the previous check.
+### 2. Cryptographic Hash Chaining
+Every check is mathematically chained to the check before it:
+- Each proof includes the SHA-256 digital fingerprint (hash) of the previous check.
 - Checks must be performed in exact sequence.
 - Checks cannot be skipped, reordered, or copied between different sessions.
 
 ### 3. Verification Chain Integrity Guard
-Scheduled periodic verifications must be launched directly from the **Offline Session** tab. If a wearer runs a check from the standard single-check **Verify** tab, an unlinked proof token is created that does not tie into the active ratchet chain. The app displays an amber warning callout on the session card reminding the wearer to keep the chain intact.
+Scheduled periodic verifications must be launched directly from the **Offline Session** tab. If a wearer runs a check from the standard single-check **Verify** tab, an unlinked proof token is created that does not tie into the active session chain. The app displays an amber warning callout on the session card reminding the wearer to keep the chain intact.
 
 ---
 
@@ -136,7 +136,7 @@ lv://verify?session_id=chaster_strict_demo&interval_m=5&total_checks=2&min_conf=
 | :--- | :--- | :--- |
 | **1. Verify** | Single on-demand check | Enter 6-digit OTP code from Chaster $\rightarrow$ verify with camera $\rightarrow$ scan single proof token |
 | **2. History** | Local audit trail | View local verification logs and inspection telemetry $\rightarrow$ tap record for details |
-| **3. Offline Session** | Air-gapped periodic schedule | Track live interval locks $\rightarrow$ take chained checks $\rightarrow$ export signed batch bundle |
+| **3. Offline Session** | Offline periodic schedule | Track live interval locks $\rightarrow$ take chained checks $\rightarrow$ export signed batch bundle |
 
 ---
 

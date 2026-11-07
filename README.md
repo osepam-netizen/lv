@@ -1,178 +1,177 @@
-# Local Verification (`LV`) Mobile App
+# Local Verification (`LV`)
 
 <p align="center">
-  <strong>100% Air-Gapped · On-Device AI · Zero-Knowledge Chastity Verification</strong>
+  <strong>On-Device Chastity Verification · No Network Access · Privacy-First</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Network-Air--Gapped%20(No%20Internet)-10B981?style=for-the-badge&logo=shield" alt="Air-Gapped" />
-  <img src="https://img.shields.io/badge/Security-HMAC--SHA256%20Proof-7C3AED?style=for-the-badge&logo=auth0" alt="HMAC Proof" />
-  <img src="https://img.shields.io/badge/AI%20Engine-On--Device%20LiteRT-6366F1?style=for-the-badge&logo=tensorflow" alt="LiteRT" />
-  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-white?style=for-the-badge&logo=flutter" alt="Flutter" />
+  <img src="https://img.shields.io/badge/Network-No%20Internet%20Permission-10B981?style=flat-square" alt="No Internet" />
+  <img src="https://img.shields.io/badge/Verification-HMAC--SHA256%20Proof-7C3AED?style=flat-square" alt="HMAC Proof" />
+  <img src="https://img.shields.io/badge/Vision%20Engine-On--Device%20LiteRT-6366F1?style=flat-square" alt="LiteRT" />
+  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-gray?style=flat-square" alt="Platforms" />
 </p>
 
 ---
 
-## 🛡️ The Zero-Knowledge Privacy Guarantee
+## What is LV?
 
-**Local Verification (`LV`)** is an offline verification utility designed for wearers of chastity devices who want absolute certainty that **no intimate photos or videos can ever be stored, leaked, or sent to a server**.
+**Local Verification (`LV`)** is an experimental mobile tool that verifies chastity compliance locally on your phone without sending photos to any server, cloud service, or third party.
+
+Instead of uploading pictures, the app runs a lightweight computer vision model directly on your device, confirms the lock is secured, and generates a signed text code (**proof token**) that you can share with your keyholder or paste into the Chaster extension.
 
 ```mermaid
 flowchart TD
-    subgraph Device["📱 YOUR MOBILE DEVICE (Air-Gapped & Ephemeral)"]
+    subgraph Device["📱 Your Mobile Device (No Internet Access)"]
         direction TB
-        Camera["📷 Camera Sensor"] --> RAM["🧠 Temporary RAM Buffer"]
-        RAM --> AI["🤖 On-Device AI Engine"]
-        AI --> Scrub["🧼 Scrub RAM (0x00 Active Overwrite)"]
-        AI --> Token["🔐 Signed HMAC-SHA256 Proof Token"]
+        Camera["📷 Camera"] --> Frame["🖼️ Frame in temporary RAM"]
+        Frame --> Model["🔍 On-device detection model"]
+        Model --> Token["📝 Signed Proof Token (Text String)"]
+        Frame -.->|"Discarded immediately\n(Never saved to disk or gallery)"| Dropped["🗑️ Memory cleared"]
     end
 
-    subgraph Chaster["💻 Chaster Browser Extension"]
-        Verify["🛡️ Mathematical Signature Verified (No Images Transmitted)"]
+    subgraph Keyholder["💻 Chaster / Keyholder"]
+        Verify["✅ Verifies signature against challenge code\n(No images ever sent or received)"]
     end
 
-    Token -->|"Pass Proof Token"| Verify
-```
-
-### 1. 📴 Physically Air-Gapped (Zero Internet Permission)
-The app is built without network capability. In the application manifest (`AndroidManifest.xml`), the standard `android.permission.INTERNET` permission is **completely absent**. The mobile operating system physically blocks the app from creating any socket, HTTP, or network connections.
-
-### 2. 🧼 Ephemeral RAM Scrubbing
-Camera frames reside strictly in temporary volatile RAM. Immediately upon running on-device inference, the memory buffer is actively overwritten with all zeros (`0x00`) using cryptographic memory scrubbing before being deallocated.
-
-### 3. 🚫 Zero Local Storage
-The app does **not** save photos to the camera roll, photo gallery, temporary cache, or filesystem. Even if verification fails or an inspection error occurs, no imagery is ever persisted.
-
-### 4. 🔐 Cryptographic Proofs
-Rather than uploading pictures, `LV` generates a tamper-proof **HMAC-SHA256 signed attestation token**. The Chaster browser extension validates the mathematical signature using your shared secret key without ever needing to see your photos.
-
----
-
-## 📥 Download & Installation
-
-Official pre-built, signed release APKs are hosted directly in the [Releases](https://github.com/osepam-netizen/lv/releases) section of this repository.
-
-### Quick Install (Android)
-1. Navigate to [Releases](https://github.com/osepam-netizen/lv/releases/latest).
-2. Download the latest `lv-vX.Y.Z.apk`.
-3. Open the downloaded file on your Android device and confirm installation.
-
-### Verify SHA-256 Checksum (Optional)
-To verify the integrity of the downloaded file:
-```bash
-# On macOS / Linux:
-sha256sum lv-vX.Y.Z.apk
-# Compare the output with lv-vX.Y.Z.apk.sha256 from the release page
-```
-
-### Verify No Internet Permission (Audit)
-You can independently inspect the APK to confirm that zero internet permissions are requested:
-```bash
-aapt dump permissions lv-vX.Y.Z.apk
-# Output will confirm that android.permission.INTERNET is NOT present!
+    Token -->|"Paste token"| Verify
 ```
 
 ---
 
-## 🚀 Step-by-Step User Guide
+## Who is this for (and who is it NOT for)?
 
-### Step 1: Scan or Enter Your Lock Session Token & Challenge Code
-When a check-in is required, the Chaster extension displays a unique 6-digit challenge code and session key (or a single verification QR code).
+### 👍 Good fits:
+* **Wearers with strict privacy needs:** If your job, living situation, or personal boundaries mean you cannot have sensitive photos stored on your device or transmitted over the internet.
+* **Solo wearers & streak challenges:** If you lock yourself (or participate in events like Locktober) and want an objective check-in mechanism to keep yourself accountable without relying on manual self-reporting.
+* **High-frequency check-in schedules:** If you or your keyholder want check-ins every few hours (e.g. while at work or traveling), but don't want to spam your keyholder's inbox with repetitive photos throughout the day.
+* **Offline travel:** When you are camping, flying, or without reliable cellular service, the app can run a schedule of checks offline and bundle them for submission when you're back online.
 
-On the **Verify** tab in the LV mobile app:
-- Tap **Scan Chaster QR (Auto-Fill Both)** to automatically populate both your session token and 6-digit challenge code in one tap, **OR**
-- Paste your extension token into the **Extension Token / Secret Key** field (it will be automatically remembered for this lock session) and enter the 6-digit challenge code.
+### 🛑 Not intended for:
+* **Replacing human trust and intimacy in a D/s dynamic:** For many couples, the photo exchange is an essential part of the relationship, vulnerability, and play. If you and your keyholder have established trust and enjoy that interaction, this tool is not meant to replace that.
+* **High-stakes enforcement without human oversight:** On-device computer vision is not 100% foolproof. Poor lighting, unusual cage geometries, or heavy shadows can lead to failed checks. We recommend pairing automated checks with periodic human reviews.
 
-### Step 2: Run On-Device Verification
-1. On the **Verify** tab, select your device profile:
-   - **Male Chastity Cage** (Built-in Lock or Padlock)
-   - **Female Chastity Belt** (Built-in Lock or Padlock)
-2. Tap **Start Camera Inspection**.
-3. Align the camera viewfinder so that your locked chastity device is clearly visible. (You do not need to write codes on paper—the active challenge code is cryptographically bound into the proof token).
-4. Tap the capture button.
-
-### Step 3: Live On-Device Analysis
-The app switches to the analyzing screen with an animated status indicator:
-1. *Binds the active 6-digit challenge code to the cryptographic proof.*
-2. *Inspects device presence and locked padlock engagement via LiteRT neural engine.*
-3. *Enforces anti-cheating & live scene checks (rejects photos of screens/monitors, printed photos, open shackles, inserted keys, or unworn loose hardware).*
-4. *Signs the verification result with HMAC-SHA256.*
-
-### Step 4: Submit Verification to Chaster
-Once verified, the full-screen **Verification Result** page displays:
-- An **HMAC-SHA256 Proof Token**.
-
-**To submit:**
-- Tap **Copy** and paste the proof token string into the Chaster extension input field.
-
-The Chaster extension verifies the signature instantly and clears your verification check-in!
+> ⚠️ **Project Status:** The computer vision model is an **early baseline prototype**. We are sharing this early to gather community feedback and determine whether there is sufficient interest before investing in larger dataset collection and dedicated seal verification.
 
 ---
 
-## ⏱️ Offline Periodic Sessions (Air-Gapped Batch Mode)
+## Privacy & Security: How It Actually Works
 
-For long-term offline periods (e.g. traveling, sleeping, or away from a computer), `LV` supports multi-check **Offline Verification Sessions** located on the **Offline Session** tab:
+We deliberately avoid marketing buzzwords. Here is exactly how the app protects your privacy:
 
-1. **Hardware Monotonic Lock**: The app reads direct hardware uptime counters (measuring genuine physical time since boot, including sleep). Changing device date/time in OS Settings cannot bypass the interval lock.
-2. **Cryptographic Hash Chaining**: Every check embeds the SHA-256 hash of the previous check, ensuring proofs cannot be reordered or forged.
-3. **Batch Export**: Once checks are completed, tap **Copy Batch** to export a signed verification bundle directly to Chaster.
+### 1. No Internet Permission
+The application is built without network capabilities. In Android's manifest (`AndroidManifest.xml`), `android.permission.INTERNET` is **omitted entirely**. The mobile operating system physically blocks the app from making network connections, opening web sockets, or transferring data.
 
-### 🧪 Try an Instant Demo Session
-To test offline verification on your device without waiting hours, point the LV app scanner at this QR code or copy the test link:
+You can verify this yourself using any APK inspection tool (see instructions below).
+
+### 2. No Photos Persisted to Disk
+When you take a picture for verification:
+* The camera frame is held in volatile app memory (`RAM`) only while the model evaluates it.
+* Once the check completes, the image buffer is dropped.
+* The image is **never** written to your camera roll, photo gallery, temporary cache, or internal storage. Even if a check fails, no image file remains on your device.
+
+### 3. Verification by Mathematical Signature, Not Photos
+Instead of transmitting an image, the app computes an **HMAC-SHA256 signature** using a shared secret and a one-time challenge code. 
+
+The resulting proof string proves that:
+1. The on-device model evaluated a locked device.
+2. The check occurred during the active session.
+3. The response matches the requested challenge code.
+
+Your keyholder or the Chaster extension can verify this mathematical signature in seconds without ever having an image file exist.
+
+---
+
+## 📥 Download & Independent Verification
+
+Signed release APKs are hosted on the [Releases](https://github.com/osepam-netizen/lv/releases) page.
+
+### How to verify the APK has no internet access:
+You don't need to trust our code. You can verify the APK yourself using independent tools:
+
+1. Download the APK from [Releases](https://github.com/osepam-netizen/lv/releases/latest).
+2. Visit an online APK inspector such as **[betadrop.app/apk-inspector](https://betadrop.app/apk-inspector/)** or use the Android command line:
+   ```bash
+   aapt dump permissions lv-vX.Y.Z.apk
+   ```
+3. Look at the requested permissions list:
+   - Notice that `android.permission.INTERNET` is **not present**.
+   - The OS enforces this barrier at the kernel level.
+
+---
+
+## 🚀 How to Use
+
+### Single Verification Check
+1. **Get your challenge code:** From the Chaster extension or your keyholder, get your current verification code (or scan the verification QR code).
+2. **Open LV:** Tap **Scan Chaster QR** (or enter the key and 6-digit challenge code manually).
+3. **Align camera:** Hold the camera so your locked device is clearly visible under good lighting.
+4. **Capture:** Tap the shutter button. The app evaluates the image locally in 1–2 seconds.
+5. **Submit proof:** Copy the generated proof token and paste it back into the Chaster extension.
+
+---
+
+## ⏱️ Offline Periodic Verification (Batch Mode)
+
+For situations where you are away from your computer or traveling without connection, the app supports **Offline Sessions** on the **Offline Session** tab:
+
+1. **Hardware-backed timers:** The countdown timer between checks is tied to your phone's physical hardware uptime (time elapsed since boot), not the system clock. Changing your phone's date or time settings will not bypass the interval lock.
+2. **Sequential verification chaining:** Each check embeds the cryptographic hash of the previous check, ensuring checks are completed in order and cannot be pre-recorded or skipped.
+3. **Batch submission:** At the end of the day or trip, tap **Copy Batch** to export all completed checks in a single string for your keyholder or extension to validate.
+
+### Try an instant 1-minute demo:
+Scan this QR code with the LV app (or open the link) to test a quick 3-check demo without waiting hours:
 
 <p align="center">
   <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=lv%3A%2F%2Fverify%3Fsession_id%3Ddemo_quick_test%26interval_m%3D1%26total_checks%3D3%26min_conf%3D0.60%26deadline_ts%3D1893456000%26type%3Dmale_cage_padlock" width="180" alt="Instant Demo QR" /><br/>
-  <em>Scan directly with the LV App ("Scan Chaster QR" button)</em>
+  <em>Scan directly in LV app ("Scan Chaster QR" button)</em>
 </p>
 
 ```text
 lv://verify?session_id=demo_quick_test&interval_m=1&total_checks=3&min_conf=0.60&deadline_ts=1893456000&type=male_cage_padlock
 ```
-*In the app: tap **Scan Chaster QR** on Tab 1 or go to **Offline Session** $\rightarrow$ tap **Scan Session QR Code**.*
 
-> 📖 **Full Guide & Security Architecture**: See [docs/OFFLINE_VERIFICATION.md](docs/OFFLINE_VERIFICATION.md) for full protocol specifications and additional test links.
-
----
-
-## 🔍 Hardware & Compliance Profiles
-
-| Device Profile | Required Verification State | Immediate Security Violations |
-| :--- | :--- | :--- |
-| **Male Cage (Padlock)** | Device properly worn + Padlock shackle fully closed | Open padlock, key inserted in lock, unworn loose device, unlocked anatomy, or screen/photo spoof |
-| **Male Cage (Built-in)** | Device properly worn with internal lock cylinder engaged | Key inserted in lock, unworn loose device, unlocked anatomy, or screen/photo spoof |
-| **Female Belt (Padlock)** | Belt properly worn + Padlock shackle fully closed | Open padlock, key inserted in lock, unworn loose device, unlocked anatomy, or screen/photo spoof |
-| **Female Belt (Built-in)** | Belt properly worn with built-in closure locked | Key inserted in lock, unworn loose device, unlocked anatomy, or screen/photo spoof |
+> 📖 For full technical details on periodic sessions, see [docs/OFFLINE_VERIFICATION.md](docs/OFFLINE_VERIFICATION.md).
 
 ---
 
 ## ❓ Frequently Asked Questions (FAQ)
 
 <details>
-<summary><strong>Can keyholders or Chaster admins see my verification photos?</strong></summary>
+<summary><strong>Does this app replace my keyholder?</strong></summary>
 
-**No. It is technically impossible.** The application has no internet access, and images are scrubbed from RAM immediately after analysis. Neither Chaster, nor your keyholder, nor the app developers receive any images.
+**No.** This app is an optional utility. It does not replace the communication, trust, or dynamic between a wearer and a keyholder. Many users use it for secondary check-ins (e.g. automated 4-hour daytime intervals), while keeping a daily human photo or video check-in with their partner in the evening.
 </details>
 
 <details>
-<summary><strong>What if my challenge code isn't recognized?</strong></summary>
+<summary><strong>Why not just crop my face and tattoos out of regular photos?</strong></summary>
 
-Make sure the code is written in bold, clear numbers with high contrast (dark marker on white paper or skin) and that your room is well lit.
+For many wearers, manual cropping works well and is all they need. However:
+1. Cropping still leaves sensitive photos on your phone's camera roll or deleted folder.
+2. Accidents happen (wrong file selected, cloud backup syncs before editing, etc.).
+3. Some wearers are simply uncomfortable with any sensitive media existing on their device at all.
+If you are already satisfied with manual cropping, you might not need this app.
 </details>
 
 <details>
-<summary><strong>Can this be used on an airplane or without cellular service?</strong></summary>
+<summary><strong>Can keyholders, Chaster, or the developers see my photos?</strong></summary>
 
-**Yes!** The application is 100% offline. You do not need Wi-Fi or cellular reception to run verification.
+**No.** The app has no internet permission, so it cannot communicate with any remote server. Frames are processed in device RAM and discarded immediately. No images ever leave your phone.
 </details>
 
 <details>
-<summary><strong>Can someone cheat periodic checks by changing the date or time on their phone?</strong></summary>
+<summary><strong>What if the model doesn't recognize my cage?</strong></summary>
 
-**No.** The app enforces check intervals using a hardware uptime clock. This counter measures genuine hardware CPU ticks and deep-sleep time; changing the phone's date, time, or timezone in system settings has zero effect on the countdown lock.
+Vision models depend heavily on lighting, contrast, and angle. Ensure good lighting and a clean background. If your device has an unusual custom design or silicone sleeve, the baseline model might struggle. We are exploring support for **numbered tamper-evident seals** as a more reliable and standardized alternative.
+</details>
+
+<details>
+<summary><strong>Can someone trick the timer by changing the phone's clock?</strong></summary>
+
+**No.** Periodic checks measure elapsed hardware uptime (CPU ticks since boot, including sleep mode). Adjusting the date, time, or timezone in Android or iOS settings does not alter the hardware counter.
 </details>
 
 ---
 
 ## 📜 License
 
-Licensed under the MIT License. See [LICENSE](LICENSE) for details.
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
